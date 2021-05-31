@@ -1,5 +1,6 @@
 # Architecture
 Karla Sofía González Rodríguez | 0214774
+
 Saúl Eduardo Zepeda de la Torre | 0214016
 
 ## Diagram
