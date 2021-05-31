@@ -15,7 +15,7 @@ import (
 )
 
 var sock mangos.Socket
-//var end = make(chan string)
+
 var controllerAddress = "tcp://localhost:40899"
 
 var Workloads = make(map[string]Workload)
@@ -39,13 +39,6 @@ type Worker struct{
 	Jobs_done int    `json:"jobs_done"`
 }
 
-/*var proofs = make(map[string]Proof)
-type Proof struct{
-	ID int
-	Worker string
-}
-*/
-
 func die(format string, v ...interface{}) {
 	fmt.Fprintln(os.Stderr, fmt.Sprintf(format, v...))
 	os.Exit(1)
@@ -66,40 +59,27 @@ func Start() {
 	if err = sock.Listen(controllerAddress); err != nil {
 		die("can't listen on rep socket: %s", err.Error())
 	}
-	/*err = sock.SetOption(mangos.OptionSurveyTime, time.Second)
-	if err != nil {
-		die("Set Option: %s", err.Error())
-	}*/
 
-	for {
-		// Could also use sock.RecvMsg to get header
-		/*err = sock.Send([]byte("Workers"))
-		if err !=nil{
-			die("There are no workers %+v", err.Error())
-		}*/
-		for{
-			if answer, err = sock.Recv();err !=nil{
-				break
-			}
-
-			new_worker := Worker{}
-			info := strings.Split(string(answer)," ")
-			new_worker.Name = info[0]
-			new_worker.Status = "Available"
-			new_worker.Tags = info[1]
-			port_int, _ := strconv.Atoi(info[3])
-			new_worker.Port = port_int
-			jobs_done_int, _ := strconv.Atoi(info[2])
-			new_worker.Jobs_done = jobs_done_int
-			new_worker.URL = "localhost:" + info[3]
-			_, ok := Workers[new_worker.Name]
-			if !ok {
-				Workers[new_worker.Name] = new_worker
-			}
-
-			fmt.Println(Workers[new_worker.Name].Name, " serves in localhost:", Workers[new_worker.Name].Port, "\n")
-
+	for{
+		if answer, err = sock.Recv();err !=nil{
+			break
 		}
+		new_worker := Worker{}
+		info := strings.Split(string(answer)," ")
+		new_worker.Name = info[0]
+		new_worker.Status = "Available"
+		new_worker.Tags = info[1]
+		port_int, _ := strconv.Atoi(info[3])
+		new_worker.Port = port_int
+		jobs_done_int, _ := strconv.Atoi(info[2])
+		new_worker.Jobs_done = jobs_done_int
+		new_worker.URL = "localhost:" + info[3]
+		_, ok := Workers[new_worker.Name]
+		if !ok {
+			Workers[new_worker.Name] = new_worker
+		}
+
+		fmt.Println(Workers[new_worker.Name].Name, " serves in localhost:", Workers[new_worker.Name].Port, "\n")
 
 	}
 }
